@@ -45,3 +45,96 @@
 .read-the-docs {
   color: #888;
 } */
+
+
+
+
+/* ---------- Begin .rotating-border ---------- */
+@keyframes spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.rotating-border {
+  --border-radius: 1rem;
+  /* --border-radius: 1rem; */
+  --border-size: 0.5rem;
+  --border-bg: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+  --padding: 1rem;
+  position: relative;
+  overflow: hidden;
+  /* font-size: 2rem; */
+  padding: calc(var(--padding) + var(--border-size));
+  border-radius: var(--border-radius);
+  display: inline-block;
+}
+
+.rotating-border::before {
+  content: '';
+  display: block;
+  background: var(--border-bg);
+  width: calc(100% * 1.41421356237);
+  padding-bottom: calc(100% * 1.41421356237);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 100%;
+  z-index: -2;
+  animation: spin 5s linear infinite;
+}
+
+.rotating-border--reverse::before {
+  animation-direction: reverse;
+}
+
+.rotating-border::after {
+  content: '';
+  position: absolute;
+  inset: var(--border-size);
+  background: white;
+  z-index: -1;
+  border-radius: calc(var(--border-radius) - var(--border-size));
+}
+
+/* ---------- End .rotating-border ---------- */
+/* ---------- Begin customizing .rotating-border ---------- */
+.rotating-border--google {
+  /* --border-radius: 0.5rem; */
+  --border-radius: 9999rem;
+  --border-size: 0.25rem;
+  --padding: 0.2rem;
+  --border-bg: conic-gradient(#ea4335 0turn 0.125turn, #4285f4 0.125turn 0.25turn, #fbbc05 0.25turn 0.375turn, #34a853 0.375turn 0.5turn, #ea4335 0.5turn 0.625turn, #4285f4 0.625turn 0.75turn, #fbbc05 0.75turn 0.875turn, #34a853 0.875turn 1turn);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 2;
+}
+
+.rotating-border--rainbow {
+  --border-radius: 1.5rem;
+  --border-size: 0.5rem;
+  --border-bg: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+}
+
+.rotating-border--black-white {
+  --border-radius: 100%;
+  /* --border-size: 0.6rem; */
+  --border-size: 0.2rem;
+  --padding: 0.1rem;
+  --border-bg: conic-gradient(#fff 0turn 0.05turn, #333 0.05turn 0.1turn, #fff 0.1turn 0.15turn, #333 0.15turn 0.2turn, #fff 0.2turn 0.25turn, #333 0.25turn 0.3turn, #fff 0.3turn 0.35turn, #333 0.35turn 0.4turn, #fff 0.4turn 0.45turn, #333 0.45turn 0.5turn, #fff 0.5turn 0.55turn, #333 0.55turn 0.6turn, #fff 0.6turn 0.65turn, #333 0.65turn 0.7turn, #fff 0.7turn 0.75turn, #333 0.75turn 0.8turn, #fff 0.8turn 0.85turn, #333 0.85turn 0.9turn, #fff 0.9turn 0.95turn, #333 0.95turn 1turn);
+}
+
+.rotating-border--black-yellow {
+  --border-radius: 100%;
+  --border-bg: conic-gradient(#f0c400 0.1666turn, #444 0.1666turn 0.3333turn, #f0c400 0.3333turn 0.5turn, #444 0.5turn 0.6666turn, #f0c400 0.6666turn 0.8333turn, #444 0.8333turn);
+  width: 2.5rem;
+  height: 2.5rem;
+  text-align: center;
+}
+
+/* ---------- End customizing .rotating-border ---------- */

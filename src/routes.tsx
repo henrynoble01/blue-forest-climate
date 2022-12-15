@@ -4,6 +4,7 @@ import Index from "./pages";
 import About from "./pages/about";
 import Blog from "./pages/blog";
 import Chats from "./pages/chats";
+import CreatePost from "./pages/create-post";
 import Login from "./pages/login";
 import MyPosts from "./pages/my-posts";
 import Register from "./pages/register";
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
       {
         path: "register",
         element: <Register />,
+      },
+      {
+        path: "create-post",
+        element: <CreatePost />,
       },
     ],
   },

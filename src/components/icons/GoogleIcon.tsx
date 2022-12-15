@@ -1,3 +1,4 @@
+// Icon Source = SVG Repo https://www.svgrepo.com/svg/355037/google
 const GoogleIcon = () => {
   return (
     <svg

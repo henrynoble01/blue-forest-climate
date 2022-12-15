@@ -13,12 +13,13 @@ import {
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   signInWithRedirect,
+  User,
 } from "firebase/auth";
-import { auth } from "../persistence/firebase";
-import { IconAlertCircle, IconLock } from "@tabler/icons";
+import { auth } from "../infastructure/persistence/firebase";
+import { IconAlertCircle, IconAt, IconLock } from "@tabler/icons";
 import { z } from "zod";
 import { useLocalStorage, useSetState } from "@mantine/hooks";
-import { AxiosError } from "axios";
+// import { AxiosError } from "axios";
 import GoogleIcon from "../components/icons/GoogleIcon";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -39,6 +40,11 @@ const Login = () => {
   const [uid, setUid] = useLocalStorage({
     key: "uid",
     defaultValue: "",
+  });
+
+  const [user, setUser] = useLocalStorage<Partial<User>>({
+    key: "user",
+    defaultValue: {},
   });
 
   const navigate = useNavigate();
@@ -68,9 +74,11 @@ const Login = () => {
 
         // The signed-in user info.
         const user = result?.user;
+
         console.log(user);
         setUid(user?.uid!);
-        // navigate("/my-posts");
+        setUser({ ...user });
+        navigate("/my-posts");
       })
       .catch((error) => {
         // Handle Errors here.
@@ -109,11 +117,11 @@ const Login = () => {
                 label='Email'
                 placeholder='Email'
                 {...form.getInputProps("email")}
+                icon={<IconAt size={16} />}
               />
               <PasswordInput
                 label='Password'
                 placeholder='Password'
-                // description='Password must include at least one letter, number and special character'
                 {...form.getInputProps("password")}
                 icon={<IconLock size={16} />}
               />
