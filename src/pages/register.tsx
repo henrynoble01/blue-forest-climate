@@ -30,7 +30,7 @@ const LoginSchema = z.object({
   password: z.string().min(1, { message: "Password is required" }),
 });
 
-const Login = () => {
+const Register = () => {
   const [error, setError] = useSetState({
     error: false,
     message: "",
@@ -59,30 +59,30 @@ const Login = () => {
       });
   };
 
-  useEffect(() => {
-    getRedirectResult(auth)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access Google APIs.
-        const credential = GoogleAuthProvider.credentialFromResult(result!);
-        const token = credential?.accessToken;
+  //   useEffect(() => {
+  //     getRedirectResult(auth)
+  //       .then((result) => {
+  //         // This gives you a Google Access Token. You can use it to access Google APIs.
+  //         const credential = GoogleAuthProvider.credentialFromResult(result!);
+  //         const token = credential?.accessToken;
 
-        // The signed-in user info.
-        const user = result?.user;
-        console.log(user);
-        setUid(user?.uid!);
-        // navigate("/my-posts");
-      })
-      .catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-      });
-  }, []);
+  //         // The signed-in user info.
+  //         const user = result?.user;
+  //         console.log(user);
+  //         setUid(user?.uid!);
+  //         // navigate("/my-posts");
+  //       })
+  //       .catch((error) => {
+  //         // Handle Errors here.
+  //         const errorCode = error.code;
+  //         const errorMessage = error.message;
+  //         // The email of the user's account used.
+  //         const email = error.customData.email;
+  //         // The AuthCredential type that was used.
+  //         const credential = GoogleAuthProvider.credentialFromError(error);
+  //         // ...
+  //       });
+  //   }, []);
 
   const signInWithGoogle = () => {
     const provider = new GoogleAuthProvider();
@@ -177,4 +177,4 @@ function LocalImage({ imgSrc }: { imgSrc: string }) {
   );
 }
 
-export default Login;
+export default Register;

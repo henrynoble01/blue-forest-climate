@@ -6,6 +6,7 @@ import Blog from "./pages/blog";
 import Chats from "./pages/chats";
 import Login from "./pages/login";
 import MyPosts from "./pages/my-posts";
+import Register from "./pages/register";
 import Root from "./pages/root";
 // import Root from "./pages/Root";
 
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
       {
         path: "my-posts",
         element: <MyPosts />,
+      },
+      {
+        path: "register",
+        element: <Register />,
       },
     ],
   },
