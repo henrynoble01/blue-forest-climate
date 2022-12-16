@@ -14,7 +14,7 @@ import {
   signInWithEmailAndPassword,
   signInWithRedirect,
 } from "firebase/auth";
-import { auth } from "../infastructure/persistence/firebase";
+import { auth } from "../infrastructure/persistence/firebase";
 import { IconAlertCircle, IconAt, IconLock } from "@tabler/icons";
 import { z } from "zod";
 import { useLocalStorage, useSetState } from "@mantine/hooks";

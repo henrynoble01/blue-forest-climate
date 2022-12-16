@@ -1,10 +1,16 @@
-import { Table } from "@mantine/core";
+import { Button, Table } from "@mantine/core";
+import { Link, useNavigate } from "react-router-dom";
 
 const MyPosts = () => {
   return (
     <div className=''>
       <div className='container mx-auto'>
-        <h3 className=''>My Posts</h3>
+        <div className='flex gap-2'>
+          <h3 className=''>My Posts</h3>
+          <Link to='/create-post' className='no-underline '>
+            <Button variant='outline'>Add Post</Button>
+          </Link>
+        </div>
 
         <div className='mt-4'>
           <Table verticalSpacing='xs' fontSize='md'>

@@ -14,6 +14,8 @@ import { useLocalStorage } from "@mantine/hooks";
 import React, { useEffect } from "react";
 import { User } from "firebase/auth";
 
+// Spinning Border https://codepen.io/MauriciAbad/pen/WNrpmPr
+
 // function PopoverMenu() {
 //   return (
 //     <Popover width={300} trapFocus position='bottom' withArrow shadow='md'>
