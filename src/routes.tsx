@@ -5,10 +5,12 @@ import About from "./pages/about";
 import Blog from "./pages/blog";
 import Chats from "./pages/chats";
 import CreatePost from "./pages/create-post";
+import EditPost from "./pages/edit-post";
 import Login from "./pages/login";
 import MyPosts from "./pages/my-posts";
 import Register from "./pages/register";
 import Root from "./pages/root";
+import ViewPosts from "./pages/view-posts";
 // import Root from "./pages/Root";
 
 export const router = createBrowserRouter([
@@ -50,7 +52,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "edit-post/:postId",
-        element: <CreatePost />,
+        element: <EditPost />,
+      },
+      {
+        path: "view-post/:postId",
+        element: <ViewPosts />,
       },
     ],
   },

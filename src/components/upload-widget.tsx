@@ -1,12 +1,12 @@
 import { Button } from "@mantine/core";
 import React, { useEffect, useRef } from "react";
 
-const cloudName = "djq5o9jxq";
-const uploadPreset = "xebiqicu";
+export const cloudName = "djq5o9jxq";
+export const uploadPreset = "xebiqicu";
 const folder = "blue_forest";
 
 interface IUploadWidgetProp {
-  setImgUrl: (v: string) => void;
+  setImgUrl: (secure_url: string, public_id: string) => void;
 }
 
 const CloudinaryUploadWidget: React.FC<IUploadWidgetProp> = ({ setImgUrl }) => {
@@ -25,22 +25,26 @@ const CloudinaryUploadWidget: React.FC<IUploadWidgetProp> = ({ setImgUrl }) => {
           // cropping: true, //add a cropping steps
           // showAdvancedOptions: true,  //add advanced options (public_id and tag)
           // sources: [ "local", "url"], // restrict the upload sources to URL and local files
-          // multiple: false,  //restrict upload to a single file
+          multiple: false, //restrict upload to a single file
           // tags: ["users", "profile"], //add the given tags to the uploaded files
           // context: {alt: "user_uploaded"}, //add the given context data to the uploaded files
-          // clientAllowedFormats: ["images"], //restrict uploading to image files only
-          // maxImageFileSize: 2000000,  //restrict file size to less than 2MB
+          clientAllowedFormats: ["images"], //restrict uploading to image files only
+          maxImageFileSize: 2000000, //restrict file size to less than 2MB
           // maxImageWidth: 2000, //Scales the image down to a width of 2000 pixels before uploading
           // theme: "purple", //change to a purple theme
         },
         (
           error: any,
-          result: { event: string; info: { secure_url: string } }
+          result: {
+            event: string;
+            info: { secure_url: string; public_id: string };
+          }
         ) => {
           if (!error && result && result.event === "success") {
             console.log("Done! Here is the image info: ", result.info);
             const imageURL = result.info.secure_url;
-            setImgUrl(imageURL);
+            const publicURL = result.info.public_id;
+            setImgUrl(imageURL, publicURL);
             // document
             //   ?.getElementById("uploadedimage")!
             //   .setAttribute("src", result.info.secure_url);

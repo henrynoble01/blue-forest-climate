@@ -26,23 +26,19 @@ import { IPost, ITag, PostSchema } from "../infrastructure/schema";
 import {
   addNeTag,
   addNewPost,
-  getPostByPostId,
+  editNewPost,
   getTags,
 } from "../infrastructure/persistence/firestore";
 import { useEffect, useState } from "react";
-import CloudinaryUploadWidget from "../components/upload-widget";
+import CloudinaryUploadWidget from "./upload-widget";
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../infrastructure/persistence/firebase";
 import { useSetState } from "@mantine/hooks";
 import { getAuthObject } from "../infrastructure/persistence/auth";
-// import { getAuthObject } from "../infrastructure/persistence/auth";
 
-const CreatePost = () => {
+const PostCreationForm = ({ post }: { post: IPost }) => {
   const navigate = useNavigate();
   const [loadState, setLoadState] = useState(false);
   const [tagList, setTagList] = useState<ITag[]>([]);
-  let { postId } = useParams<{ postId: string }>();
 
   const form = useForm({
     initialValues: {
@@ -68,7 +64,7 @@ const CreatePost = () => {
       Highlight,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
-    content: "",
+    content: post.content || "",
   });
 
   const [postedBy, setPostedBy] = useSetState({
@@ -82,13 +78,8 @@ const CreatePost = () => {
   }, []);
 
   useEffect(() => {
-    if (postId) {
-      getPostByPostId(postId).then((res) => {
-        editor?.commands.insertContent(res.content);
-        // console.log(res.content);
-
-        form.setValues(res);
-      });
+    if (post) {
+      form.setValues(post);
     }
   }, []);
 
@@ -117,8 +108,8 @@ const CreatePost = () => {
     showNotification({
       id: "load-data",
       loading: true,
-      title: "Saving Post",
-      message: "Post is currently Saving",
+      title: "Updating Post",
+      message: "Post is currently Updating",
       autoClose: false,
       disallowClose: true,
     });
@@ -127,20 +118,18 @@ const CreatePost = () => {
 
     const postData = {
       ...values,
-      ...postedBy,
       content: editor?.getHTML(),
-      postId: crypto.randomUUID(),
     };
 
-    await addNewPost(postData)
+    await editNewPost(post.id!, postData)
       .then((res) => {
         console.log(res);
         setLoadState(false);
         updateNotification({
           id: "load-data",
           color: "teal",
-          title: "Post Saved",
-          message: "Post was saved successfully",
+          title: "Post Updated",
+          message: "Post was updated successfully",
           icon: <IconCheck size={16} />,
           autoClose: 2000,
         });
@@ -176,7 +165,6 @@ const CreatePost = () => {
           <Grid grow>
             <Grid.Col lg={6} md={12}>
               <TextInput
-                // className='w-3/5'
                 mt='md'
                 label='Title'
                 placeholder='Title'
@@ -228,17 +216,7 @@ const CreatePost = () => {
                 {...form.getInputProps("tags")}
               />
             </Grid.Col>
-            {/* <Grid.Col lg={6} md={12}>
-              <FileInput
-                mt='md'
-                label='Post Image'
-                placeholder='Image'
-                icon={<IconUpload size={14} />}
-                valueComponent={ValueComponent}
-                {...form.getInputProps("img")}
-                accept='image/*'
-              />
-            </Grid.Col> */}
+
             <Grid.Col span={12}>
               <Textarea
                 mt='md'
@@ -351,4 +329,4 @@ const ValueComponent: FileInputProps["valueComponent"] = ({ value }) => {
   return <Value file={value!} />;
 };
 
-export default CreatePost;
+export default PostCreationForm;

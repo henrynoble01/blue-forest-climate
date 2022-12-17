@@ -14,11 +14,14 @@ export const PostSchema = z.object({
     .min(1, "Estimated Reading time should be above 1"),
   status: z.union([z.literal("PRIVATE"), z.literal("PUBLISHED")]),
   content: z.string(),
+  img: z.string().optional(),
   tags: z.array(z.string()),
   postId: z.string().uuid().optional(),
   displayName: z.string().optional(),
   email: z.string().optional(),
   uid: z.string().optional(),
+  img_public_id: z.string().optional(),
+  id: z.string().optional(),
 });
 
 export type IPost = z.infer<typeof PostSchema>;

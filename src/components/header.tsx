@@ -119,7 +119,12 @@ const AppHeader = () => {
       <div className='flex justify-between items-center'>
         <div className=''>
           <LocalNavLink url='/'>
-            <header className='font-600 text-2xl'>BLUE FOREST</header>
+            <header
+              className='font-600 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-green-400 to-blue-500 to-blue-700
+            '
+            >
+              BLUE FOREST
+            </header>
           </LocalNavLink>
         </div>
         <div className=''>

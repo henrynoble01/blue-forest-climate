@@ -8,6 +8,7 @@ import {
   serverTimestamp,
   setDoc,
   Timestamp,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { IPost, ITag } from "../schema";
@@ -24,12 +25,20 @@ export async function addNewPost(value: IPost) {
     {
       ...value,
       timestamp: serverTimestamp(),
-      createdAt: Timestamp.fromDate(new Date()),
+      createdAt: new Date(),
     },
     {
       merge: true,
     }
   );
+}
+
+export async function editNewPost(id: string, value: IPost) {
+  const editPostRef = doc(db, "posts", id);
+
+  return await updateDoc(editPostRef, {
+    ...value,
+  });
 }
 
 export async function addNeTag(value: ITag) {
@@ -76,7 +85,21 @@ export async function getPostByPostId(postId: string) {
   let posts: IPost[] = [];
   tagQuerySnapShot.forEach((item) => {
     const value = item.data() as IPost;
-    posts.push(value);
+    const id = item.id;
+    posts.push({ ...value, id: id });
   });
   return posts[0];
+}
+
+export async function getPostForUsers() {
+  const user = getAuthObject();
+  const q = query(collection(db, "posts"), where("status", "==", "PUBLISHED"));
+  const tagQuerySnapShot = await getDocs(q);
+
+  let posts: IPost[] = [];
+  tagQuerySnapShot.forEach((item) => {
+    const value = item.data() as IPost;
+    posts.push(value);
+  });
+  return posts;
 }
