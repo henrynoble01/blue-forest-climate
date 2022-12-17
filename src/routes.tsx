@@ -48,6 +48,10 @@ export const router = createBrowserRouter([
         path: "create-post",
         element: <CreatePost />,
       },
+      {
+        path: "edit-post/:postId",
+        element: <CreatePost />,
+      },
     ],
   },
 ]);

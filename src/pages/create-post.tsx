@@ -7,11 +7,9 @@ import TextAlign from "@tiptap/extension-text-align";
 import Superscript from "@tiptap/extension-superscript";
 import SubScript from "@tiptap/extension-subscript";
 import { useForm, zodResolver } from "@mantine/form";
-// import { z } from "zod";
 import {
   Button,
   Center,
-  FileInput,
   FileInputProps,
   Grid,
   Group,
@@ -23,29 +21,28 @@ import {
   TextInput,
 } from "@mantine/core";
 import { IconCheck, IconPhoto, IconUpload } from "@tabler/icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { IPost, ITag, PostSchema } from "../infrastructure/schema";
 import {
   addNeTag,
   addNewPost,
+  getPostByPostId,
   getTags,
-  // tagQuerySnapShot,
-  // tagSub,
 } from "../infrastructure/persistence/firestore";
 import { useEffect, useState } from "react";
-// import { addDoc, collection, onSnapshot } from "firebase/firestore";
-// import { db } from "../infrastructure/persistence/firebase";
-// import { useListState } from "@mantine/hooks";
 import CloudinaryUploadWidget from "../components/upload-widget";
 import { showNotification, updateNotification } from "@mantine/notifications";
-// import {Link  } from 'react-router-dom'
-
-// const content = `<h1> Create Your new Posts</h1>`;
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../infrastructure/persistence/firebase";
+import { useSetState } from "@mantine/hooks";
+import { getAuthObject } from "../infrastructure/persistence/auth";
+// import { getAuthObject } from "../infrastructure/persistence/auth";
 
 const CreatePost = () => {
   const navigate = useNavigate();
   const [loadState, setLoadState] = useState(false);
   const [tagList, setTagList] = useState<ITag[]>([]);
+  let { postId } = useParams<{ postId: string }>();
 
   const form = useForm({
     initialValues: {
@@ -55,7 +52,7 @@ const CreatePost = () => {
       status: "PRIVATE",
       content: "",
       img: "",
-      tags: [],
+      tags: [] as string[],
     },
     validate: zodResolver(PostSchema),
   });
@@ -70,15 +67,42 @@ const CreatePost = () => {
       Highlight,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
-    // content,
+    content: "",
+  });
+
+  const [postedBy, setPostedBy] = useSetState({
+    displayName: "",
+    email: "",
+    uid: "",
   });
 
   useEffect(() => {
-    // const tags =
     getTags().then((val) => setTagList(val));
   }, []);
 
+  useEffect(() => {
+    if (postId) {
+      getPostByPostId(postId).then((res) => {
+        editor?.commands.insertContent(res.content);
+        // console.log(res.content);
+
+        form.setValues(res);
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const user = getAuthObject();
+
+    setPostedBy({
+      displayName: user?.displayName!,
+      email: user?.email!,
+      uid: user?.uid,
+    });
+  }, []);
+
   const submit = async (values: IPost | any) => {
+    // first submit Picture
     if (!form.values.img) {
       showNotification({
         title: "Image Missing",
@@ -102,6 +126,7 @@ const CreatePost = () => {
 
     const postData = {
       ...values,
+      ...postedBy,
       content: editor?.getHTML(),
       postId: crypto.randomUUID(),
     };
@@ -122,12 +147,9 @@ const CreatePost = () => {
       .catch(() => {
         setLoadState(false);
       });
-
-    // first submit Picture
   };
 
   const handleImageUrl = (url: string) => {
-    // console.log(url);
     form.setFieldValue("img", url);
   };
 
@@ -176,7 +198,7 @@ const CreatePost = () => {
                 mt='md'
                 label='Status'
                 placeholder='Status'
-                description='This determines if the      '
+                description='This determines if the post is seen by the others'
                 data={[
                   { value: "PRIVATE", label: "PRIVATE" },
                   { value: "PUBLISHED", label: "PUBLISHED" },
@@ -229,7 +251,11 @@ const CreatePost = () => {
 
           <div className='mt-4'>
             <p className='font-600   '>Content</p>
-            <RichTextEditor editor={editor} placeholder='Content of your post'>
+            <RichTextEditor
+              editor={editor}
+              placeholder='Content of your post'
+              {...form.getInputProps("content")}
+            >
               <RichTextEditor.Toolbar sticky stickyOffset={60}>
                 <RichTextEditor.ControlsGroup>
                   <RichTextEditor.Bold />

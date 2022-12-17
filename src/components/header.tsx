@@ -37,13 +37,8 @@ function OverlayMenu({
   userObj,
 }: {
   children: React.ReactNode;
-  userObj?: User;
+  userObj?: User | null;
 }) {
-  // const [user] = useLocalStorage<Partial<User>>({
-  //   key: "user",
-  //   defaultValue: JSON.parse(localStorage.getItem("user")!),
-  // });
-
   const navigate = useNavigate();
 
   const logout = () => {
@@ -72,13 +67,13 @@ function OverlayMenu({
         ) : (
           <>
             <Menu.Label>Account</Menu.Label>
-            <LocalLink to='/settings'>
+            {/* <LocalLink to='/settings'>
               <Menu.Item icon={<IconSettings size={14} />}>Settings</Menu.Item>
-            </LocalLink>
+            </LocalLink> */}
             <LocalLink to={"/my-posts"}>
               <Menu.Item icon={<IconPhoto size={14} />}>My Posts</Menu.Item>
             </LocalLink>
-            <Menu.Item
+            {/* <Menu.Item
               icon={<IconSearch size={14} />}
               rightSection={
                 <Text size='xs' color='dimmed'>
@@ -87,12 +82,9 @@ function OverlayMenu({
               }
             >
               Search
-            </Menu.Item>
-            <Menu.Divider />
-            <Menu.Label>Danger zone</Menu.Label>
-            {/* <Menu.Item icon={<IconArrowsLeftRight size={14} />}>
-              Transfer my data
             </Menu.Item> */}
+            <Menu.Divider />
+            {/* <Menu.Label>Danger zone</Menu.Label> */}
             <Menu.Item
               color='red'
               icon={<IconLogout size={14} />}
@@ -108,18 +100,14 @@ function OverlayMenu({
 }
 
 const AppHeader = () => {
-  const [user, setUser] = useLocalStorage<Partial<User>>({
-    key: "user",
-    defaultValue: JSON.parse(localStorage.getItem("user")!),
-  });
-
-  const [userObj, setUserObj] = useState<User>();
+  const [userObj, setUserObj] = useState<User | null>();
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
       const uid = user.uid;
       setUserObj(user);
     } else {
+      setUserObj(user);
       // setLogin({ isUserLoggedIn: false });
       // User is signed out
       // ...
@@ -137,7 +125,7 @@ const AppHeader = () => {
         <div className=''>
           <div className='flex gap-[0.75rem]'>
             <LocalNavLink url='blog' text='Blog'></LocalNavLink>
-            <LocalNavLink url='chats' text='Chats'></LocalNavLink>
+            {/* <LocalNavLink url='chats' text='Chats'></LocalNavLink> */}
             <LocalNavLink url='about' text='About'></LocalNavLink>
           </div>
         </div>

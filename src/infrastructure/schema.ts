@@ -16,6 +16,9 @@ export const PostSchema = z.object({
   content: z.string(),
   tags: z.array(z.string()),
   postId: z.string().uuid().optional(),
+  displayName: z.string().optional(),
+  email: z.string().optional(),
+  uid: z.string().optional(),
 });
 
 export type IPost = z.infer<typeof PostSchema>;
