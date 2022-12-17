@@ -9,18 +9,17 @@ import speakUp from "../assets/speak-up.png";
 import throwLessFood from "../assets/throw-less-food.png";
 import transport from "../assets/transport.png";
 import {
+  browserLocalPersistence,
   getRedirectResult,
   GoogleAuthProvider,
-  inMemoryPersistence,
   setPersistence,
   signInWithEmailAndPassword,
   signInWithRedirect,
-  User,
 } from "firebase/auth";
 import { auth } from "../infrastructure/persistence/firebase";
 import { IconAlertCircle, IconAt, IconLock } from "@tabler/icons";
 import { z } from "zod";
-import { useLocalStorage, useSetState } from "@mantine/hooks";
+import { useSetState } from "@mantine/hooks";
 // import { AxiosError } from "axios";
 import GoogleIcon from "../components/icons/GoogleIcon";
 import { Link, useNavigate } from "react-router-dom";
@@ -32,15 +31,9 @@ const Login = () => {
     message: "",
   });
 
-  // const [uid, setUid] = useLocalStorage({
-  //   key: "uid",
-  //   defaultValue: "",
-  // });
-
-  // const [user, setUser] = useLocalStorage<Partial<User>>({
-  //   key: "user",
-  //   defaultValue: {},
-  // });
+  const [loadState, setLoadState] = useSetState({
+    loginLoading: false,
+  });
 
   const navigate = useNavigate();
 
@@ -53,10 +46,16 @@ const Login = () => {
   });
 
   const submitLoginForm = (values: typeof form.values) => {
-    setPersistence(auth, inMemoryPersistence).then(() => {
+    setLoadState({ loginLoading: true });
+
+    setPersistence(auth, browserLocalPersistence).then(() => {
       signInWithEmailAndPassword(auth, values.email, values.password)
-        .then((res) => {})
+        .then((res) => {
+          setLoadState({ loginLoading: false });
+          navigate("/my-posts");
+        })
         .catch((e) => {
+          setLoadState({ loginLoading: false });
           setError({ error: true, message: e.code });
         });
     });
@@ -90,7 +89,7 @@ const Login = () => {
   }, []);
 
   const signInWithGoogle = () => {
-    setPersistence(auth, inMemoryPersistence).then(() => {
+    setPersistence(auth, browserLocalPersistence).then(() => {
       const provider = new GoogleAuthProvider();
       signInWithRedirect(auth, provider);
     });
@@ -135,7 +134,12 @@ const Login = () => {
               </Alert>
             ) : null}
             <Group position='left' mt='xl'>
-              <Button variant='filled' className='w-full' type='submit'>
+              <Button
+                variant='filled'
+                className='w-full'
+                type='submit'
+                loading={loadState.loginLoading}
+              >
                 Login
               </Button>
               <Button

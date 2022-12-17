@@ -9,8 +9,11 @@ import speakUp from "../assets/speak-up.png";
 import throwLessFood from "../assets/throw-less-food.png";
 import transport from "../assets/transport.png";
 import {
+  browserLocalPersistence,
+  createUserWithEmailAndPassword,
   getRedirectResult,
   GoogleAuthProvider,
+  setPersistence,
   signInWithEmailAndPassword,
   signInWithRedirect,
 } from "firebase/auth";
@@ -31,6 +34,9 @@ const Register = () => {
     error: false,
     message: "",
   });
+  const [loadState, setLoadState] = useSetState({
+    registerLoading: false,
+  });
 
   // const [uid, setUid] = useLocalStorage({
   //   key: "uid",
@@ -49,11 +55,18 @@ const Register = () => {
   });
 
   const submitForm = (values: typeof form.values) => {
-    signInWithEmailAndPassword(auth, values.email, values.password)
-      .then((res) => {})
-      .catch((e) => {
-        setError({ error: true, message: e.code });
-      });
+    setLoadState({ registerLoading: true });
+    setPersistence(auth, browserLocalPersistence).then(() => {
+      createUserWithEmailAndPassword(auth, values.email, values.password)
+        .then((res) => {
+          setLoadState({ registerLoading: false });
+          navigate("/my-posts");
+        })
+        .catch((e) => {
+          setLoadState({ registerLoading: false });
+          setError({ error: true, message: e.code });
+        });
+    });
   };
 
   useEffect(() => {
@@ -82,8 +95,10 @@ const Register = () => {
   }, []);
 
   const authWithGoogle = () => {
-    const provider = new GoogleAuthProvider();
-    signInWithRedirect(auth, provider);
+    setPersistence(auth, browserLocalPersistence).then(() => {
+      const provider = new GoogleAuthProvider();
+      signInWithRedirect(auth, provider);
+    });
   };
 
   return (
@@ -134,7 +149,12 @@ const Register = () => {
               </Alert>
             ) : null}
             <Group position='left' mt='xl'>
-              <Button variant='filled' className='w-full' type='submit'>
+              <Button
+                variant='filled'
+                className='w-full'
+                type='submit'
+                loading={loadState.registerLoading}
+              >
                 Sign Up
               </Button>
               <Button

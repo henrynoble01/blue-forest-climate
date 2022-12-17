@@ -10,32 +10,13 @@ import {
 } from "@tabler/icons";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 
-import { Popover, Button, TextInput, Menu, Text } from "@mantine/core";
-import { useLocalStorage, useSetState } from "@mantine/hooks";
-import React, { useEffect } from "react";
+import { Menu, Text } from "@mantine/core";
+import { useLocalStorage } from "@mantine/hooks";
+import React, { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "../infrastructure/persistence/firebase";
 
 // Spinning Border https://codepen.io/MauriciAbad/pen/WNrpmPr
-
-// function PopoverMenu() {
-//   return (
-//     <Popover width={300} trapFocus position='bottom' withArrow shadow='md'>
-//       <Popover.Target>
-//         <Button>Toggle popover</Button>
-//       </Popover.Target>
-//       <Popover.Dropdown
-//         sx={(theme) => ({
-//           background:
-//             theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
-//         })}
-//       >
-//         <TextInput label='Name' placeholder='Name' size='xs' />
-//         <TextInput label='Email' placeholder='john@doe.com' size='xs' mt='xs' />
-//       </Popover.Dropdown>
-//     </Popover>
-//   );
-// }
 
 function LocalLink({
   children,
@@ -51,29 +32,19 @@ function LocalLink({
   );
 }
 
-function OverlayMenu({ children }: { children: React.ReactNode }) {
-  const [user] = useLocalStorage<Partial<User>>({
-    key: "user",
-    defaultValue: JSON.parse(localStorage.getItem("user")!),
-  });
+function OverlayMenu({
+  children,
+  userObj,
+}: {
+  children: React.ReactNode;
+  userObj?: User;
+}) {
+  // const [user] = useLocalStorage<Partial<User>>({
+  //   key: "user",
+  //   defaultValue: JSON.parse(localStorage.getItem("user")!),
+  // });
 
   const navigate = useNavigate();
-
-  const [login, setLogin] = useSetState({ isUserLoggedIn: false });
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/firebase.User
-      const uid = user.uid;
-      setLogin({ isUserLoggedIn: true });
-      // ...
-    } else {
-      setLogin({ isUserLoggedIn: false });
-      // User is signed out
-      // ...
-    }
-  });
 
   const logout = () => {
     signOut(auth).then(() => {
@@ -85,7 +56,7 @@ function OverlayMenu({ children }: { children: React.ReactNode }) {
     <Menu shadow='md' width={200}>
       <Menu.Target>{children}</Menu.Target>
       <Menu.Dropdown>
-        {!login.isUserLoggedIn ? (
+        {!userObj ? (
           <>
             <Menu.Label>Auth</Menu.Label>
             <LocalLink to={"/login"}>
@@ -137,30 +108,23 @@ function OverlayMenu({ children }: { children: React.ReactNode }) {
 }
 
 const AppHeader = () => {
-  const user = auth.currentUser;
-  // const [user, setUser] = useLocalStorage<Partial<User>>({
-  //   key: "user",
-  //   defaultValue: JSON.parse(localStorage.getItem("user")!),
-  // });
-  // const [login, setLogin] = useSetState({ isUserLoggedIn: false });
+  const [user, setUser] = useLocalStorage<Partial<User>>({
+    key: "user",
+    defaultValue: JSON.parse(localStorage.getItem("user")!),
+  });
 
-  // // useEffect(() => {
-  // //   console.log(user);
-  // // }, []);
+  const [userObj, setUserObj] = useState<User>();
 
-  // onAuthStateChanged(auth, (user) => {
-  //   if (user) {
-  //     // User is signed in, see docs for a list of available properties
-  //     // https://firebase.google.com/docs/reference/js/firebase.User
-  //     const uid = user.uid;
-  //     setLogin({ isUserLoggedIn: true });
-  //     // ...
-  //   } else {
-  //     setLogin({ isUserLoggedIn: false });
-  //     // User is signed out
-  //     // ...
-  //   }
-  // });
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const uid = user.uid;
+      setUserObj(user);
+    } else {
+      // setLogin({ isUserLoggedIn: false });
+      // User is signed out
+      // ...
+    }
+  });
 
   return (
     <div className='container mx-auto'>
@@ -177,15 +141,15 @@ const AppHeader = () => {
             <LocalNavLink url='about' text='About'></LocalNavLink>
           </div>
         </div>
-        <OverlayMenu>
+        <OverlayMenu userObj={userObj}>
           <div className='relative cursor-pointer '>
             {/* <div className='rotating-border rotating-border--google'> */}
-            <div className='rotating-border rotating-border--black-white  rotating-border--reverse flex justify-center items-center '>
-              {user?.photoURL ? (
+            <div className='rotating-border rotating-border--black-white  rotating-border--reverse flex justify-center items-center  '>
+              {userObj?.photoURL ? (
                 <img
                   width={30}
                   height={30}
-                  src={user?.photoURL}
+                  src={userObj?.photoURL}
                   alt=''
                   className='rounded-full'
                 />
@@ -193,8 +157,6 @@ const AppHeader = () => {
                 <IconPlant2 size={30} color='gray' className='rounded-full' />
               )}
             </div>
-
-            {/* <div className='rounded-full  border-2 border-dashed h-10 w-10 flex justify-center items-center  hover:animate-[spin_3s_linear_infinite] absolute -top-[0.125rem] -left-[0.125rem] right-0 bottom-0 '></div> */}
           </div>
         </OverlayMenu>
       </div>
