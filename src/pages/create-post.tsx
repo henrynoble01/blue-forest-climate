@@ -102,7 +102,7 @@ const CreatePost = () => {
     });
   }, []);
 
-  const submit = async (values: IPost | any) => {
+  const submit = (values: IPost | any) => {
     // first submit Picture
     if (!form.values.img) {
       showNotification({
@@ -132,7 +132,7 @@ const CreatePost = () => {
       postId: crypto.randomUUID(),
     };
 
-    await addNewPost(postData)
+     addNewPost(postData)
       .then((res) => {
         console.log(res);
         setLoadState(false);
