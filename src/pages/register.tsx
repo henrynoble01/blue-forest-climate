@@ -15,6 +15,7 @@ import {
   GoogleAuthProvider,
   setPersistence,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signInWithRedirect,
 } from "firebase/auth";
 import { auth } from "../infrastructure/persistence/firebase";
@@ -97,7 +98,10 @@ const Register = () => {
   const authWithGoogle = () => {
     setPersistence(auth, browserLocalPersistence).then(() => {
       const provider = new GoogleAuthProvider();
-      signInWithRedirect(auth, provider);
+      // signInWithRedirect(auth, provider);
+      signInWithPopup(auth, provider).then(() => {
+        navigate("/my-posts");
+      });
     });
   };
 

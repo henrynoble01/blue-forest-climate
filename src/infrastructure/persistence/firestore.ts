@@ -11,6 +11,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
+import { z } from "zod";
 import { IPost, ITag } from "../schema";
 import { getAuthObject } from "./auth";
 import { db } from "./firebase";
@@ -103,3 +104,49 @@ export async function getPostForUsers() {
   });
   return posts;
 }
+
+export const CommentsSchema = z.object({
+  postedBy: z.string(),
+  postedByEmail: z.string(),
+  message: z.string(),
+  postId: z.string(),
+  datePosted: z.date(),
+});
+
+export type IComment = z.infer<typeof CommentsSchema>;
+
+export async function addNewComment(value: IComment) {
+  const commentRef = doc(collection(db, "comments"));
+  return await setDoc(
+    commentRef,
+    { ...value },
+    {
+      merge: true,
+    }
+  );
+}
+
+export async function getRealTimeComments(postId: IComment["postId"]) {
+  const q = query(collection(db, "comments"), where("postId", "==", postId));
+  const data: IComment[] = [];
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const cities = [];
+    querySnapshot.forEach((doc) => {
+      cities.push(doc.data());
+      data.push(doc.data() as IComment);
+    });
+    // console.log("Current cities in CA: ", cities.join(", "));
+  });
+
+  return data;
+}
+
+export const streamGroceryListItems = (
+  postId: any,
+  snapshot: any,
+  error: any
+) => {
+  const itemsColRef = collection(db, "comments");
+  const itemsQuery = query(itemsColRef, where("postId", "==", postId));
+  return onSnapshot(itemsQuery, snapshot, error);
+};

@@ -1,7 +1,7 @@
 import { AdvancedImage } from "@cloudinary/react";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { thumbnail } from "@cloudinary/url-gen/actions/resize";
-import { Button, Divider, Grid } from "@mantine/core";
+import { Button, Divider, Grid, Loader, Paper } from "@mantine/core";
 import { IconCalendarTime, IconClock, IconUser } from "@tabler/icons";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -19,13 +19,21 @@ const Blog = () => {
   return (
     <div className='mt-2 container mx-auto'>
       <div className='flex flex-col gap-5'>
-        <Grid>
-          {postList.map((p, i) => (
-            <Grid.Col lg={4} md={6} sm={12} className='' key={i}>
-              <BlogItem {...p} />
-            </Grid.Col>
-          ))}
-        </Grid>
+        {postList ? (
+          <Grid>
+            {postList.map((p, i) => (
+              <Grid.Col lg={4} md={6} sm={12} className='' key={i}>
+                <BlogItem {...p} />
+              </Grid.Col>
+            ))}
+          </Grid>
+        ) : (
+          <div className='container mx-auto'>
+            <div className='flex justify-center items-center'>
+              <Loader size='xl' />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -50,7 +58,11 @@ const BlogItem: React.FC<IPost> = (post) => {
   }
 
   return (
-    <div className='bg-white rounded-5 shadow-md my-2 overflow-hidden'>
+    <Paper
+      shadow='sm'
+      p='md'
+      // className='bg-white rounded-5 shadow-md my-2 overflow-hidden'
+    >
       <div className=''>
         <Link to={`/view-post/${post.postId}`} className='flex justify-center'>
           <AdvancedImage cldImg={myImage} />
@@ -93,7 +105,7 @@ const BlogItem: React.FC<IPost> = (post) => {
           </div>
         </div>
       </div>
-    </div>
+    </Paper>
   );
 };
 

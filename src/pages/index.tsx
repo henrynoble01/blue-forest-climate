@@ -1,5 +1,7 @@
 import environment1 from "../assets/environment-2.jpg";
 import climateReportCause1 from "../assets/climate-report-cause.png";
+import { Button } from "@mantine/core";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -34,6 +36,14 @@ const Index = () => {
                       Science Guy'
                     </p>
                   </blockquote>
+                </div>
+                <div className='flex justify-center items-center gap-4'>
+                  <Link to='/blog'>
+                    <Button color={"green"}>Get Started</Button>
+                  </Link>
+                  <Link to='/login'>
+                    <Button>Login</Button>
+                  </Link>
                 </div>
               </div>
             </div>
