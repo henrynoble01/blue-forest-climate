@@ -1,5 +1,6 @@
 import {
   IconArrowsLeftRight,
+  IconLogout,
   IconMessageCircle,
   IconPhoto,
   IconPlant2,
@@ -7,33 +8,15 @@ import {
   IconSettings,
   IconTrash,
 } from "@tabler/icons";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
-import { Popover, Button, TextInput, Menu, Text } from "@mantine/core";
+import { Menu, Text } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
-import React, { useEffect } from "react";
-import { User } from "firebase/auth";
+import React, { useEffect, useState } from "react";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
+import { auth } from "../infrastructure/persistence/firebase";
 
 // Spinning Border https://codepen.io/MauriciAbad/pen/WNrpmPr
-
-// function PopoverMenu() {
-//   return (
-//     <Popover width={300} trapFocus position='bottom' withArrow shadow='md'>
-//       <Popover.Target>
-//         <Button>Toggle popover</Button>
-//       </Popover.Target>
-//       <Popover.Dropdown
-//         sx={(theme) => ({
-//           background:
-//             theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
-//         })}
-//       >
-//         <TextInput label='Name' placeholder='Name' size='xs' />
-//         <TextInput label='Email' placeholder='john@doe.com' size='xs' mt='xs' />
-//       </Popover.Dropdown>
-//     </Popover>
-//   );
-// }
 
 function LocalLink({
   children,
@@ -49,17 +32,31 @@ function LocalLink({
   );
 }
 
-function OverlayMenu({ children }: { children: React.ReactNode }) {
-  const [user] = useLocalStorage<Partial<User>>({
-    key: "user",
-    defaultValue: JSON.parse(localStorage.getItem("user")!),
-  });
+function OverlayMenu({
+  children,
+  userObj,
+}: {
+  children: React.ReactNode;
+  userObj?: User;
+}) {
+  // const [user] = useLocalStorage<Partial<User>>({
+  //   key: "user",
+  //   defaultValue: JSON.parse(localStorage.getItem("user")!),
+  // });
+
+  const navigate = useNavigate();
+
+  const logout = () => {
+    signOut(auth).then(() => {
+      navigate("/");
+    });
+  };
 
   return (
     <Menu shadow='md' width={200}>
       <Menu.Target>{children}</Menu.Target>
       <Menu.Dropdown>
-        {!user ? (
+        {!userObj ? (
           <>
             <Menu.Label>Auth</Menu.Label>
             <LocalLink to={"/login"}>
@@ -93,11 +90,15 @@ function OverlayMenu({ children }: { children: React.ReactNode }) {
             </Menu.Item>
             <Menu.Divider />
             <Menu.Label>Danger zone</Menu.Label>
-            <Menu.Item icon={<IconArrowsLeftRight size={14} />}>
+            {/* <Menu.Item icon={<IconArrowsLeftRight size={14} />}>
               Transfer my data
-            </Menu.Item>
-            <Menu.Item color='red' icon={<IconTrash size={14} />}>
-              Delete my account
+            </Menu.Item> */}
+            <Menu.Item
+              color='red'
+              icon={<IconLogout size={14} />}
+              onClick={logout}
+            >
+              Logout
             </Menu.Item>
           </>
         )}
@@ -112,9 +113,18 @@ const AppHeader = () => {
     defaultValue: JSON.parse(localStorage.getItem("user")!),
   });
 
-  // useEffect(() => {
-  //   console.log(user);
-  // }, []);
+  const [userObj, setUserObj] = useState<User>();
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const uid = user.uid;
+      setUserObj(user);
+    } else {
+      // setLogin({ isUserLoggedIn: false });
+      // User is signed out
+      // ...
+    }
+  });
 
   return (
     <div className='container mx-auto'>
@@ -131,24 +141,22 @@ const AppHeader = () => {
             <LocalNavLink url='about' text='About'></LocalNavLink>
           </div>
         </div>
-        <OverlayMenu>
+        <OverlayMenu userObj={userObj}>
           <div className='relative cursor-pointer '>
             {/* <div className='rotating-border rotating-border--google'> */}
-            <div className='rotating-border rotating-border--black-white  rotating-border--reverse'>
-              {user?.photoURL ? (
+            <div className='rotating-border rotating-border--black-white  rotating-border--reverse flex justify-center items-center  '>
+              {userObj?.photoURL ? (
                 <img
                   width={30}
                   height={30}
-                  src={user?.photoURL}
+                  src={userObj?.photoURL}
                   alt=''
                   className='rounded-full'
                 />
               ) : (
-                <IconPlant2 size={30} color='gray' />
+                <IconPlant2 size={30} color='gray' className='rounded-full' />
               )}
             </div>
-
-            {/* <div className='rounded-full  border-2 border-dashed h-10 w-10 flex justify-center items-center  hover:animate-[spin_3s_linear_infinite] absolute -top-[0.125rem] -left-[0.125rem] right-0 bottom-0 '></div> */}
           </div>
         </OverlayMenu>
       </div>
