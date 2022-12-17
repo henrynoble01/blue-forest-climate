@@ -63,7 +63,7 @@ const BlogPage: React.FC<IPost> = (post) => {
   }
 
   return (
-    <div className='container  mx-auto p-4'>
+    <div className='container prose lg:prose-xl max-w-prose  mx-auto p-4'>
       <Paper shadow='sm' p='md'>
         <div className=''>
           <AdvancedImage cldImg={myImage} />
@@ -92,10 +92,13 @@ const BlogPage: React.FC<IPost> = (post) => {
             </span>
           </div>
         </div>
-        <div
-          className=''
-          dangerouslySetInnerHTML={{ __html: post?.content as string }}
-        />
+        <div className=''>
+          <div
+            // className='prose lg:prose-xl text-base prose prose-truegray xl:text-xl'
+            className='prose prose-sm sm:prose lg:prose-lg xl:prose-2xl m-5 focus:outline-none'
+            dangerouslySetInnerHTML={{ __html: post?.content as string }}
+          />
+        </div>
       </Paper>
     </div>
   );
