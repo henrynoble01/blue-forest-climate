@@ -2,11 +2,14 @@ import "./App.css";
 import { MantineProvider } from "@mantine/core";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./routes";
+import { NotificationsProvider } from "@mantine/notifications";
 
 function App() {
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
-      <RouterProvider router={router} />
+      <NotificationsProvider>
+        <RouterProvider router={router} />
+      </NotificationsProvider>
     </MantineProvider>
   );
 }

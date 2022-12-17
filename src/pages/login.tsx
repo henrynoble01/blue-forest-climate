@@ -11,6 +11,8 @@ import transport from "../assets/transport.png";
 import {
   getRedirectResult,
   GoogleAuthProvider,
+  inMemoryPersistence,
+  setPersistence,
   signInWithEmailAndPassword,
   signInWithRedirect,
   User,
@@ -22,14 +24,7 @@ import { useLocalStorage, useSetState } from "@mantine/hooks";
 // import { AxiosError } from "axios";
 import GoogleIcon from "../components/icons/GoogleIcon";
 import { Link, useNavigate } from "react-router-dom";
-
-const LoginSchema = z.object({
-  email: z
-    .string()
-    .min(1, { message: "email is required" })
-    .email({ message: "Invalid Email" }),
-  password: z.string().min(1, { message: "Password is required" }),
-});
+import { LoginSchema } from "../infrastructure/schema";
 
 const Login = () => {
   const [error, setError] = useSetState({
@@ -37,15 +32,15 @@ const Login = () => {
     message: "",
   });
 
-  const [uid, setUid] = useLocalStorage({
-    key: "uid",
-    defaultValue: "",
-  });
+  // const [uid, setUid] = useLocalStorage({
+  //   key: "uid",
+  //   defaultValue: "",
+  // });
 
-  const [user, setUser] = useLocalStorage<Partial<User>>({
-    key: "user",
-    defaultValue: {},
-  });
+  // const [user, setUser] = useLocalStorage<Partial<User>>({
+  //   key: "user",
+  //   defaultValue: {},
+  // });
 
   const navigate = useNavigate();
 
@@ -58,11 +53,13 @@ const Login = () => {
   });
 
   const submitLoginForm = (values: typeof form.values) => {
-    signInWithEmailAndPassword(auth, values.email, values.password)
-      .then((res) => {})
-      .catch((e) => {
-        setError({ error: true, message: e.code });
-      });
+    setPersistence(auth, inMemoryPersistence).then(() => {
+      signInWithEmailAndPassword(auth, values.email, values.password)
+        .then((res) => {})
+        .catch((e) => {
+          setError({ error: true, message: e.code });
+        });
+    });
   };
 
   useEffect(() => {
@@ -75,9 +72,9 @@ const Login = () => {
         // The signed-in user info.
         const user = result?.user;
 
-        console.log(user);
-        setUid(user?.uid!);
-        setUser({ ...user });
+        // console.log(user);
+        // setUid(user?.uid!);
+        // setUser({ ...user });
         navigate("/my-posts");
       })
       .catch((error) => {
@@ -85,7 +82,7 @@ const Login = () => {
         const errorCode = error.code;
         const errorMessage = error.message;
         // The email of the user's account used.
-        const email = error.customData.email;
+        // const email = error.customData.email;
         // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
         // ...
@@ -93,8 +90,10 @@ const Login = () => {
   }, []);
 
   const signInWithGoogle = () => {
-    const provider = new GoogleAuthProvider();
-    signInWithRedirect(auth, provider);
+    setPersistence(auth, inMemoryPersistence).then(() => {
+      const provider = new GoogleAuthProvider();
+      signInWithRedirect(auth, provider);
+    });
   };
 
   return (

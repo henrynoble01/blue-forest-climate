@@ -1,5 +1,6 @@
 import {
   IconArrowsLeftRight,
+  IconLogout,
   IconMessageCircle,
   IconPhoto,
   IconPlant2,
@@ -7,12 +8,13 @@ import {
   IconSettings,
   IconTrash,
 } from "@tabler/icons";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 import { Popover, Button, TextInput, Menu, Text } from "@mantine/core";
-import { useLocalStorage } from "@mantine/hooks";
+import { useLocalStorage, useSetState } from "@mantine/hooks";
 import React, { useEffect } from "react";
-import { User } from "firebase/auth";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
+import { auth } from "../infrastructure/persistence/firebase";
 
 // Spinning Border https://codepen.io/MauriciAbad/pen/WNrpmPr
 
@@ -55,11 +57,35 @@ function OverlayMenu({ children }: { children: React.ReactNode }) {
     defaultValue: JSON.parse(localStorage.getItem("user")!),
   });
 
+  const navigate = useNavigate();
+
+  const [login, setLogin] = useSetState({ isUserLoggedIn: false });
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // User is signed in, see docs for a list of available properties
+      // https://firebase.google.com/docs/reference/js/firebase.User
+      const uid = user.uid;
+      setLogin({ isUserLoggedIn: true });
+      // ...
+    } else {
+      setLogin({ isUserLoggedIn: false });
+      // User is signed out
+      // ...
+    }
+  });
+
+  const logout = () => {
+    signOut(auth).then(() => {
+      navigate("/");
+    });
+  };
+
   return (
     <Menu shadow='md' width={200}>
       <Menu.Target>{children}</Menu.Target>
       <Menu.Dropdown>
-        {!user ? (
+        {!login.isUserLoggedIn ? (
           <>
             <Menu.Label>Auth</Menu.Label>
             <LocalLink to={"/login"}>
@@ -93,11 +119,15 @@ function OverlayMenu({ children }: { children: React.ReactNode }) {
             </Menu.Item>
             <Menu.Divider />
             <Menu.Label>Danger zone</Menu.Label>
-            <Menu.Item icon={<IconArrowsLeftRight size={14} />}>
+            {/* <Menu.Item icon={<IconArrowsLeftRight size={14} />}>
               Transfer my data
-            </Menu.Item>
-            <Menu.Item color='red' icon={<IconTrash size={14} />}>
-              Delete my account
+            </Menu.Item> */}
+            <Menu.Item
+              color='red'
+              icon={<IconLogout size={14} />}
+              onClick={logout}
+            >
+              Logout
             </Menu.Item>
           </>
         )}
@@ -107,14 +137,30 @@ function OverlayMenu({ children }: { children: React.ReactNode }) {
 }
 
 const AppHeader = () => {
-  const [user, setUser] = useLocalStorage<Partial<User>>({
-    key: "user",
-    defaultValue: JSON.parse(localStorage.getItem("user")!),
-  });
+  const user = auth.currentUser;
+  // const [user, setUser] = useLocalStorage<Partial<User>>({
+  //   key: "user",
+  //   defaultValue: JSON.parse(localStorage.getItem("user")!),
+  // });
+  // const [login, setLogin] = useSetState({ isUserLoggedIn: false });
 
-  // useEffect(() => {
-  //   console.log(user);
-  // }, []);
+  // // useEffect(() => {
+  // //   console.log(user);
+  // // }, []);
+
+  // onAuthStateChanged(auth, (user) => {
+  //   if (user) {
+  //     // User is signed in, see docs for a list of available properties
+  //     // https://firebase.google.com/docs/reference/js/firebase.User
+  //     const uid = user.uid;
+  //     setLogin({ isUserLoggedIn: true });
+  //     // ...
+  //   } else {
+  //     setLogin({ isUserLoggedIn: false });
+  //     // User is signed out
+  //     // ...
+  //   }
+  // });
 
   return (
     <div className='container mx-auto'>
@@ -134,7 +180,7 @@ const AppHeader = () => {
         <OverlayMenu>
           <div className='relative cursor-pointer '>
             {/* <div className='rotating-border rotating-border--google'> */}
-            <div className='rotating-border rotating-border--black-white  rotating-border--reverse'>
+            <div className='rotating-border rotating-border--black-white  rotating-border--reverse flex justify-center items-center '>
               {user?.photoURL ? (
                 <img
                   width={30}
@@ -144,7 +190,7 @@ const AppHeader = () => {
                   className='rounded-full'
                 />
               ) : (
-                <IconPlant2 size={30} color='gray' />
+                <IconPlant2 size={30} color='gray' className='rounded-full' />
               )}
             </div>
 

@@ -37,9 +37,9 @@ export async function addNeTag(value: ITag) {
 
 const tagQuery = query(collection(db, "tags"), where("label", "!=", ""));
 
-export const tagQuerySnapShot = await getDocs(collection(db, "tags"));
+export async function getTags() {
+  const tagQuerySnapShot = await getDocs(collection(db, "tags"));
 
-export function getTags() {
   let tags: ITag[] = [];
   tagQuerySnapShot.forEach((item) => {
     const value = item.data() as ITag;

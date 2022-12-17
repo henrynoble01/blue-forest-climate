@@ -21,48 +21,10 @@ import { useLocalStorage, useSetState } from "@mantine/hooks";
 import { AxiosError } from "axios";
 import GoogleIcon from "../components/icons/GoogleIcon";
 import { Link, useNavigate } from "react-router-dom";
+import { RegistrationSchema } from "../infrastructure/schema";
 
 // Regex Resources =https://regexr.com/74m8a
 // Regex Resources =https://www.w3resource.com/javascript/form/password-validation.php
-
-const RegistrationSchema = z
-  .object({
-    email: z
-      .string({ required_error: "Email is required" })
-      .min(1, { message: "email is required" })
-      .email({ message: "Invalid Email" }),
-    password: z
-      .string()
-      .min(1, { message: "Password is required" })
-      .regex(
-        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,20}$/,
-        {
-          message:
-            "Password must include at least one letter, number and special character and be between 6 to 20 characters",
-        }
-      ),
-    confirmPassword: z
-      .string()
-      .min(1, { message: "Password is required" })
-      .regex(
-        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,20}$/,
-        {
-          message:
-            "Password must include at least one letter, number and special character and be between 6 to 20 characters",
-        }
-      ),
-  })
-  .superRefine((arg, ctx) => {
-    if (arg.password !== arg.confirmPassword) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Passwords do not match",
-        path: ["confirmPassword"],
-      });
-      return false;
-    }
-    return true;
-  });
 
 const Register = () => {
   const [error, setError] = useSetState({
@@ -70,10 +32,10 @@ const Register = () => {
     message: "",
   });
 
-  const [uid, setUid] = useLocalStorage({
-    key: "uid",
-    defaultValue: "",
-  });
+  // const [uid, setUid] = useLocalStorage({
+  //   key: "uid",
+  //   defaultValue: "",
+  // });
 
   const navigate = useNavigate();
 
@@ -103,8 +65,8 @@ const Register = () => {
 
         // The signed-in user info.
         const user = result?.user;
-        console.log(user);
-        setUid(user?.uid!);
+        // console.log(user);
+        // setUid(user?.uid!);
         navigate("/my-posts");
       })
       .catch((error) => {
@@ -112,7 +74,7 @@ const Register = () => {
         const errorCode = error.code;
         const errorMessage = error.message;
         // The email of the user's account used.
-        const email = error.customData.email;
+        // const email = error.customData.email;
         // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
         // ...

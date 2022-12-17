@@ -26,3 +26,50 @@ export const TagSchema = z.object({
 });
 
 export type ITag = z.infer<typeof TagSchema>;
+
+export const LoginSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "email is required" })
+    .email({ message: "Invalid Email" }),
+  password: z.string().min(1, { message: "Password is required" }),
+});
+
+export const RegistrationSchema = z
+  .object({
+    email: z
+      .string({ required_error: "Email is required" })
+      .min(1, { message: "email is required" })
+      .email({ message: "Invalid Email" }),
+    password: z
+      .string()
+      .min(1, { message: "Password is required" })
+      .regex(
+        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,20}$/,
+        {
+          message:
+            "Password must include at least one letter, number and special character and be between 6 to 20 characters",
+        }
+      ),
+    confirmPassword: z
+      .string()
+      .min(1, { message: "Password is required" })
+      .regex(
+        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,20}$/,
+        {
+          message:
+            "Password must include at least one letter, number and special character and be between 6 to 20 characters",
+        }
+      ),
+  })
+  .superRefine((arg, ctx) => {
+    if (arg.password !== arg.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+      });
+      return false;
+    }
+    return true;
+  });

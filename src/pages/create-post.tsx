@@ -7,7 +7,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Superscript from "@tiptap/extension-superscript";
 import SubScript from "@tiptap/extension-subscript";
 import { useForm, zodResolver } from "@mantine/form";
-import { z } from "zod";
+// import { z } from "zod";
 import {
   Button,
   Center,
@@ -22,24 +22,25 @@ import {
   Textarea,
   TextInput,
 } from "@mantine/core";
-import { IconPhoto, IconUpload } from "@tabler/icons";
+import { IconCheck, IconPhoto, IconUpload } from "@tabler/icons";
 import { useNavigate } from "react-router-dom";
 import { IPost, ITag, PostSchema } from "../infrastructure/schema";
 import {
   addNeTag,
   addNewPost,
   getTags,
-  tagQuerySnapShot,
+  // tagQuerySnapShot,
   // tagSub,
 } from "../infrastructure/persistence/firestore";
 import { useEffect, useState } from "react";
-import { addDoc, collection, onSnapshot } from "firebase/firestore";
-import { db } from "../infrastructure/persistence/firebase";
-import { useListState } from "@mantine/hooks";
+// import { addDoc, collection, onSnapshot } from "firebase/firestore";
+// import { db } from "../infrastructure/persistence/firebase";
+// import { useListState } from "@mantine/hooks";
 import CloudinaryUploadWidget from "../components/upload-widget";
+import { showNotification, updateNotification } from "@mantine/notifications";
 // import {Link  } from 'react-router-dom'
 
-const content = `<h1> Create Your new Posts</h1>`;
+// const content = `<h1> Create Your new Posts</h1>`;
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ const CreatePost = () => {
       estimatedReadingTime: 0,
       status: "PRIVATE",
       content: "",
-      img: null,
+      img: "",
       tags: [],
     },
     validate: zodResolver(PostSchema),
@@ -73,12 +74,32 @@ const CreatePost = () => {
   });
 
   useEffect(() => {
-    const tags = getTags();
-    setTagList(tags);
+    // const tags =
+    getTags().then((val) => setTagList(val));
   }, []);
 
   const submit = async (values: IPost | any) => {
+    if (!form.values.img) {
+      showNotification({
+        title: "Image Missing",
+        message: "Please Upload an image",
+        color: "red",
+      });
+
+      return;
+    }
+
+    showNotification({
+      id: "load-data",
+      loading: true,
+      title: "Saving Post",
+      message: "Post is currently Saving",
+      autoClose: false,
+      disallowClose: true,
+    });
+
     setLoadState(true);
+
     const postData = {
       ...values,
       content: editor?.getHTML(),
@@ -89,6 +110,14 @@ const CreatePost = () => {
       .then((res) => {
         console.log(res);
         setLoadState(false);
+        updateNotification({
+          id: "load-data",
+          color: "teal",
+          title: "Post Saved",
+          message: "Post was saved successfully",
+          icon: <IconCheck size={16} />,
+          autoClose: 2000,
+        });
       })
       .catch(() => {
         setLoadState(false);
@@ -98,7 +127,8 @@ const CreatePost = () => {
   };
 
   const handleImageUrl = (url: string) => {
-    console.log(url);
+    // console.log(url);
+    form.setFieldValue("img", url);
   };
 
   return (
@@ -112,6 +142,7 @@ const CreatePost = () => {
               </Button>
               <div className='flex gap-3'>
                 <CloudinaryUploadWidget setImgUrl={handleImageUrl} />
+
                 <Button type='submit' loading={loadState}>
                   Save
                 </Button>
@@ -173,7 +204,7 @@ const CreatePost = () => {
                 {...form.getInputProps("tags")}
               />
             </Grid.Col>
-            <Grid.Col lg={6} md={12}>
+            {/* <Grid.Col lg={6} md={12}>
               <FileInput
                 mt='md'
                 label='Post Image'
@@ -183,7 +214,7 @@ const CreatePost = () => {
                 {...form.getInputProps("img")}
                 accept='image/*'
               />
-            </Grid.Col>
+            </Grid.Col> */}
             <Grid.Col span={12}>
               <Textarea
                 mt='md'
