@@ -141,8 +141,8 @@ export async function getRealTimeComments(postId: IComment["postId"]) {
   return data;
 }
 
-export const streamGroceryListItems = (
-  postId: any,
+export const streamCommentsForArticle = (
+  postId: string = "",
   snapshot: any,
   error: any
 ) => {

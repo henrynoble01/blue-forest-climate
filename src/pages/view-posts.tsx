@@ -6,7 +6,7 @@ import {
   getPostByPostId,
   getRealTimeComments,
   IComment,
-  streamGroceryListItems,
+  streamCommentsForArticle,
 } from "../infrastructure/persistence/firestore";
 import { Button, Loader, Paper, Tooltip } from "@mantine/core";
 import { Cloudinary } from "@cloudinary/url-gen";
@@ -96,7 +96,7 @@ const BlogPage: React.FC<IPost> = (post) => {
 
   useEffect(() => {
     // streamGroceryListItems()
-    const unsubscribe = streamGroceryListItems(
+    const unsubscribe = streamCommentsForArticle(
       post.postId,
       (querySnapshot: any) => {
         const updatedGroceryItems = querySnapshot.docs.map((docSnapshot: any) =>
@@ -139,7 +139,7 @@ const BlogPage: React.FC<IPost> = (post) => {
   };
 
   return (
-    <div className='container prose lg:prose-xl max-w-prose  mx-auto p-4'>
+    <div className='container prose  max-w-prose  mx-auto p-4'>
       <Paper shadow='sm' p='md'>
         <div className=''>
           <AdvancedImage cldImg={myImage} />
