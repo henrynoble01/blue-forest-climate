@@ -93,7 +93,7 @@ const PostCreationForm = ({ post }: { post: IPost }) => {
     });
   }, []);
 
-  const submit = async (values: IPost | any) => {
+  const submit =  (values: IPost | any) => {
     // first submit Picture
     if (!form.values.img) {
       showNotification({
@@ -106,7 +106,7 @@ const PostCreationForm = ({ post }: { post: IPost }) => {
     }
 
     showNotification({
-      id: "load-data",
+      id: "edit-data",
       loading: true,
       title: "Updating Post",
       message: "Post is currently Updating",
@@ -121,12 +121,12 @@ const PostCreationForm = ({ post }: { post: IPost }) => {
       content: editor?.getHTML(),
     };
 
-    await editNewPost(post.id!, postData)
+     editNewPost(post.id!, postData)
       .then((res) => {
         console.log(res);
         setLoadState(false);
         updateNotification({
-          id: "load-data",
+          id: "edit-data",
           color: "teal",
           title: "Post Updated",
           message: "Post was updated successfully",
